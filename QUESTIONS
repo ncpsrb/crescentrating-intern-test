@@ -1,0 +1,215 @@
+1. You're given a Figma design for a HalalTrip feature page — a "Halal Restaurant Finder" card grid.
+   Describe your exact workflow to turn that Figma file into a live, deployed page. Name the specific tools
+   you'd use at each step.
+   Expected detail: tool names (not just "a code editor"), how you handle gaps between design and code, where AI fits in, and
+   where you'd deploy.
+
+Answer: I would start by reviewing the design in Figma Dev Mode, checking the layout, spacing, typography, colors, assets,
+and card states for the Halal Restaurant Finder grid. I would clarify any gaps such as mobile layout,
+loading state, empty state, long restaurant names, missing images, and the source of restaurant data.
+Then I would implement it in VS Code using Next.js, React, TypeScript, and Tailwind CSS, creating reusable components
+like RestaurantCard, RestaurantGrid, SearchBar, and FilterBar.
+
+AI tools like Codex or ChatGPT, Claude, Antigravity would help me generate the initial component structure,
+mock data, responsive layout ideas, and tests, but I would manually review and refine the result to match the
+Figma design and production standards. I would test locally with Chrome DevTools, check performance and accessibility using Lighthouse,
+push the code to GitHub, open a pull request, and deploy it on Vercel with a preview URL before production release.
+
+2. You want to build an automation that monitors a public list of top halal travel destinations (e.g. from a
+   webpage or RSS feed), detects when a new destination is added or a ranking changes, and posts a
+   formatted summary to a Discord channel. How would you build this? What tools or services would you
+   use, and how would you handle failures silently so the team isn't spammed with error alerts?
+   Think through: how you'd detect changes (not just scrape every hour blindly), what "formatted summary" means structurally,
+   and how you'd test it before going live.
+
+Answer: I would build it using a simple automation tool like n8n, Make, or Zapier. The workflow could use several triggers, such as an RSS trigger if the source provides a feed, a scheduled trigger to check the webpage daily, or a manual trigger for testing. After the trigger runs, I would fetch the destination list, extract key fields such as destination name, rank, link, and short description, then compare the current data with the previous saved version in a small database, Google Sheet, or n8n data store. If a new destination is added or a ranking changes, the workflow would send a formatted summary to Discord using a Discord webhook. The message would include the update title, source link, date, new destinations, and ranking changes, such as “Malaysia moved from #3 to #1.” To avoid spamming the team, normal errors would be logged silently, and alerts would only be sent after repeated failures or serious parsing issues. Before going live, I would test it with mock data that changes several times, including malformed or missing data, to make sure the workflow handles errors correctly.
+
+3 A stakeholder gives you this prompt for an AI agent: "Build me a research agent that finds the top 10
+halal-friendly hotels in any city." What's wrong or incomplete about this prompt, and how would you
+rewrite it to get a reliable, usable output?
+Think about: data sources, output format, what "halal-friendly" means operationally, hallucination risk, and how the agent
+knows when it's done.
+
+Answer:
+
+# Objective: Identify and rank the top 10 halal-friendly hotels in the specified city using verifiable, publicly available sources.
+
+Input:
+
+- city_name (required)
+- country_name (optional)
+
+---
+
+## Research Rules
+
+### Allowed Sources (Priority Order)
+
+Priority 1:
+
+- Official hotel website
+  Priority 2:
+- HalalTrip
+- CrescentRating
+- HalalBooking
+  Priority 3:
+- Booking.com
+- Tripadvisor
+- Google Maps
+
+Priority 4:
+
+- Reputable travel publications published within the last 24 months
+  Do not use forums, social media posts, AI-generated content, or sources without identifiable publishers.
+
+---
+
+## Halal-Friendly Qualification Criteria
+
+A hotel is considered halal-friendly only if at least 2 of the following are verified by a source:
+
+1. Halal-certified restaurant
+2. Explicit halal dining options
+3. Prayer room available
+4. Prayer mat provided
+5. Qibla direction available
+6. Nearby mosque within 1 km
+7. Alcohol-free property
+8. Women-only facilities
+9. Ramadan services
+10. Strong Muslim traveler reviews mentioning halal facilities
+
+Hotels with only generic positive reviews must not be classified as halal-friendly.
+
+---
+
+## Verification Rules
+
+For every claim:
+
+- Must be supported by at least one source URL.
+- Prefer official hotel website confirmation.
+- If evidence cannot be found:
+- Output "NOT CONFIRMED".
+- Never infer or assume.
+
+Examples:
+
+Valid:
+"Prayer mats available"
+Source: hotel website
+
+Invalid:
+"Likely provides prayer mats"
+
+---
+
+## Ranking Methodology
+
+Calculate score:
+Halal Score (50%)
+
+- Number and quality of verified halal features
+  Review Score (25%)
+- Average review rating from major platforms
+  Location Score (15%)
+- Distance to city center and major attractions
+  Value Score (10%)
+- Rating relative to price range
+
+Total Score:
+0-100
+
+Rank hotels from highest to lowest total score.
+
+---
+
+## Required Output Format
+
+Return JSON only.
+
+{
+"city": "",
+"research_date": "",
+"hotels": [
+{
+"rank": 1,
+"hotel_name": "",
+"address": "",
+"rating": "",
+"price_range": "",
+"halal_features": [
+""
+],
+"halal_score": 0,
+"review_score": 0,
+"location_score": 0,
+"value_score": 0,
+"total_score": 0,
+"summary": "",
+"sources": [
+""
+]
+}
+],
+"research_notes": {
+"hotels_evaluated": 0,
+"hotels_qualified": 0,
+"hotels_rejected": 0
+}
+}
+
+---
+
+## Completion Criteria
+
+Task is complete only when one of the following conditions is met:
+
+Condition A:
+
+- 10 verified halal-friendly hotels have been identified and ranked.
+
+Condition B:
+
+- Fewer than 10 verified hotels exist after evaluating at least 30 candidate hotels.
+- Provide explanation in research_notes.
+
+---
+
+## Failure Conditions
+
+Return FAILED if:
+
+- Fewer than 5 qualified hotels found.
+- Sources are unavailable.
+- More than 20% of hotel records contain unverified information.
+- Ranking cannot be computed due to missing review or location data.
+
+# Do not fabricate missing information under any circumstance.
+
+4 You've been using a vibe coding tool (Claude Code, Cursor, Bolt, v0, etc.) to build something. The AI
+gives you a solution that works but the UI looks generic and the code is messy. What do you do next,
+specifically?
+Walk us through your actual review and iteration steps.
+Answer:
+
+First, I would treat the AI output as a draft, not final work. I would run the project locally, click through the main user flows, and check for obvious issues in layout, responsiveness, accessibility, and browser console errors. Then I would review the code structure in VS Code or Cursor, looking for duplicated logic, unclear component names, hardcoded values, unused code, poor state management, and styling that does not match the intended brand or design system.
+
+Next, I would improve it in small iterations. For the UI, I would compare it against the product goal or Figma reference, then adjust spacing, typography, colors, hierarchy, button states, empty states, and mobile layout so it feels intentional instead of generic. For the code, I would refactor repeated UI into reusable components, move mock data or config into separate files, clean up naming, remove unnecessary code, and make the structure easier to maintain.
+
+After each change, I would test again in the browser using Chrome DevTools, check mobile breakpoints, and run linting or tests if the project has them. If I still use AI, I would give it specific tasks like “refactor this card component to remove duplication” or “improve this layout to match this design system,” instead of asking for a full rewrite. Finally, I would do a last pass for accessibility, performance, and consistency before considering it ready for review or deployment.
+
+5 The two UI mockups below show two versions of the same halal restaurant card component for a
+Muslim travel app. One has meaningfully better UX than the other. Pick one and give 3 specific,
+concrete reasons why — no vague answers like "it looks cleaner."
+Consider: information hierarchy, scanability, action clarity, and how well each design serves a Muslim traveler's actual
+needs.
+
+Answer:
+I would pick Option B.
+
+Halal status is easier to notice. The “Halal Certified” badge is placed at the top-right and stands out, so Muslim travelers can quickly confirm the most important requirement.
+
+The information is easier to scan. Option B separates the key details clearly: restaurant name, location, rating, prayer room, open status, price, and dining options. Option A has more text and many small buttons, so it feels harder to read quickly.
+
+The main action is clearer. Option B focuses on one strong action, “Book a table,” while Option A shows too many actions at the same level, like View Menu, Get Directions, Book Table, and Save. This makes Option B easier for users to act on quickly.

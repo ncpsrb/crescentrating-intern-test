@@ -1,0 +1,407 @@
+# Product Requirements Document (PRD)
+
+## Product Name
+
+Muslim Travel Market Intelligence Dashboard
+
+## Purpose
+
+Build a lightweight web dashboard that visualizes key insights from CrescentRating and GMTI (Global Muslim Travel Index) public sources, allowing non-technical stakeholders to quickly understand destination performance, regional distribution, and available market indicators for the selected GMTI year.
+
+The dashboard should communicate the most important available metric within 3 seconds and enable users to explore supporting data interactively. If a metric is not exposed by fetched public sources for the selected year, it must be hidden or rendered as unavailable rather than filled with fallback data.
+
+---
+
+# Problem Statement
+
+Current Muslim travel market data is distributed across reports, PDFs, articles, and research publications.
+
+Business stakeholders need a fast and visual way to:
+
+- Understand market size
+- Track GMTI score distribution by selected year
+- Identify leading destinations
+- Recognize regional opportunities
+- Support strategic discussions and presentations
+
+without reading lengthy reports.
+
+---
+
+# Success Criteria
+
+A stakeholder should be able to answer the following within 30 seconds:
+
+1. Which destinations are leading in the selected GMTI year?
+2. What is the score distribution across visible destination ranks?
+3. Which regions present the biggest opportunities in the selected ranking set?
+4. Which source fields were fetched successfully or failed?
+
+---
+
+# Target Users
+
+### Primary
+
+- CrescentRating executives
+- Business development team
+- Marketing team
+- Tourism board partners
+
+### Secondary
+
+- Travel industry researchers
+- Muslim travel ecosystem partners
+
+---
+
+# Data Sources
+
+Only publicly available sources may be used.
+
+### Primary Sources
+
+- https://www.crescentrating.com
+- GMTI CSV ranking files by selected year, where available
+- Unicode CLDR territory containment for country-to-region enrichment
+
+### Example Data Points
+
+- GMTI destination rank
+- GMTI destination score
+- Rank change
+- Country code
+- Derived region
+- Regional distribution derived from visible GMTI CSV rows
+- Muslim international traveler arrivals and market value only when publicly exposed for the selected year
+
+---
+
+# Functional Requirements
+
+## 1. Hero KPI Section
+
+Displayed above the fold.
+
+KPI cards must only render when their value is available from fetched public sources for the selected year. Do not show homepage-derived metrics for historical years unless the selected year has a matching public source value.
+
+### KPI Card 1
+
+Top Region
+
+Example:
+
+- Middle East
+- Derived from GMTI CSV rows and CLDR regions
+
+Visual treatment:
+
+- Largest card
+- Bold typography
+- Occupies most visual attention
+
+---
+
+### KPI Card 2
+
+Muslim Traveler Arrivals
+
+Example:
+
+- 186M travelers
+- 2025 estimate
+
+Visual treatment:
+
+- Medium-sized card
+- Only shown when available for the selected year
+
+---
+
+### KPI Card 3
+
+Market Value
+
+Example:
+
+- USD 225B
+
+Visual treatment:
+
+- Only shown when available for the selected year
+
+---
+
+## 2. Interactive GMTI Score Chart
+
+### Objective
+
+Show GMTI destination score distribution across the currently visible destination ranks.
+
+### Chart Type
+
+Interactive line chart
+
+X-axis:
+
+- Destination rank order
+
+Y-axis:
+
+- GMTI score
+
+Features:
+
+- Hover tooltip
+- Responsive layout
+- Smooth animation
+- Must use numeric score values parsed from the selected GMTI CSV
+- Must render an unavailable state when score data is missing or non-numeric
+
+---
+
+## 3. Muslim-Friendly Destinations
+
+Display as ranked cards.
+
+Users must be able to choose how many destinations to view:
+
+- Top 5
+- Top 10
+- Top 25
+- Top 50
+- Top 100
+- All
+
+The full fetched CSV should remain available in memory so the UI can switch Top N without refetching.
+
+Each destination card includes:
+
+- Rank
+- Country name
+- GMTI score
+- Region
+- Rank change
+- Source year label, for example `GMTI 2025 CSV`
+
+Example:
+
+### Malaysia
+
+Tags:
+
+- Halal Food
+- Prayer Facilities
+- Family Friendly
+
+### Saudi Arabia
+
+Tags:
+
+- Religious Tourism
+- Premium Infrastructure
+
+### Türkiye
+
+Tags:
+
+- Heritage
+- Halal Dining
+
+### UAE
+
+Tags:
+
+- Luxury
+- Connectivity
+
+### Indonesia
+
+Tags:
+
+- Natural Attractions
+- Muslim-Friendly Services
+
+---
+
+## 4. Regional Market Distribution
+
+Chart Type:
+
+Interactive bar chart
+
+Metrics:
+
+- Asia-Pacific
+- Middle East
+- Europe
+- Africa
+- Americas
+
+Display:
+
+- Share of visible destination rows by derived region
+- Hover details
+- Percent labels must never be clipped or hidden outside the chart bounds
+- Regional share and Top Region must update when the user changes Top N
+
+---
+
+## 5. Data Source Section
+
+Display:
+
+"Live data trace"
+
+Table columns:
+
+- Data
+- Status
+- Live source
+- Source URL
+
+Purpose:
+
+- Build trust
+- Reduce hallucination concerns
+- Show exactly which fetched fields are available or unavailable
+- Source links should display as `Open`, including when multiple source links are present
+- Do not show an additional source list below the trace table
+
+---
+
+# Non-Functional Requirements
+
+## Performance
+
+- Initial load < 2 seconds
+- Mobile responsive
+- Desktop optimized
+
+## Accessibility
+
+- WCAG AA contrast
+- Keyboard navigation
+- Tooltips readable
+
+## Reliability
+
+- No fabricated data
+- Every metric traceable to source
+
+---
+
+# UI / UX Requirements
+
+## Visual Hierarchy
+
+Priority:
+
+1. Market Size KPI
+2. Growth Trend
+3. Top Destinations
+4. Regional Breakdown
+
+A user should immediately notice:
+
+"Muslim Travel Market = XXX Million Travelers"
+
+within 3 seconds.
+
+---
+
+## Layout
+
+Header
+
+↓
+
+Hero KPI Cards
+
+↓
+
+GMTI Score Chart and Regional Distribution
+
+↓
+
+Destinations with Top N selector
+
+↓
+
+Live Data Trace
+
+---
+
+# Recommended Tech Stack
+
+- Nextjs
+- CSS modules/global CSS or another lightweight styling approach
+- Native SVG charts or a chart library only when it improves maintainability
+
+Deployment:
+
+- Vercel
+
+---
+
+# Next.js Architecture Requirements
+
+The implementation should use a clean Next.js structure so issues can be traced quickly from source fetch to rendered UI.
+
+## Required Folders
+
+1. `app`
+   - Responsible for Next.js routing, layout, page entry points, and global styles.
+   - `app/page.jsx` should load the dashboard data and pass it into the UI.
+
+2. `lib`
+   - Responsible for data sources, API/public-source fetching, parsing, normalization, and formatting helpers.
+   - `lib/sourceFetchers.js` should contain fetching logic only.
+   - `lib/marketParser.js` should contain source-specific parsing logic only.
+- `lib/marketData.js` should normalize parsed values into the dashboard data model.
+- Missing or unparseable values must stay unavailable and render as `-`; do not use fallback or sample values.
+- If the selected GMTI CSV is unavailable, the dashboard must show an unavailable state and log the failed source; do not substitute another year or secondary source as real data.
+
+3. `components`
+   - Responsible for dashboard UI sections and reusable presentation components.
+   - Components should consume normalized data only and should not fetch or parse source pages.
+
+## Separation Rules
+
+- Do not place API/source fetching code inside UI components.
+- Do not place source-specific parsing logic inside UI components.
+- Do not place dashboard rendering code inside source fetching or parsing files.
+- Keep comments short and useful, focused on traceability or non-obvious logic.
+- Keep each file focused enough that a bug can be traced to one of these layers: fetch, parse, normalize, render, or style.
+
+---
+
+# Acceptance Criteria
+
+The solution is accepted when:
+
+✓ Dashboard loads successfully
+✓ KPI stat cards display only when values are available for the selected year
+✓ At least 1 interactive chart implemented
+✓ Destination section supports Top 5, Top 10, Top 25, Top 50, Top 100, and All
+✓ Score chart, regional share, and Top Region are based on the selected year and selected Top N
+✓ Live data trace table clearly references available and unavailable fields
+✓ Responsive on desktop and mobile
+✓ Most important available metric visible immediately
+✓ Deployable through Vercel, Netlify, GitHub Pages, or equivalent
+✓ Data realtime based on Primary Sources
+✓ Next.js project structure is cleanly separated into `app`, `lib`, and `components`
+✓ Missing fetched data renders as `-` or an unavailable state, not fallback/sample values
+✓ Percent labels and chart text are not clipped on desktop or mobile
+✓ Loading state uses a polished skeleton/shimmer view while server data is fetched
+
+---
+
+# Suggested Stretch Goals
+
+- Interactive world map
+- Destination comparison mode
+- GMTI score trends by year
+- PDF report export
+- AI-generated market summary
+- Dark mode
