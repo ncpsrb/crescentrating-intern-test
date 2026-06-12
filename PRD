@@ -8,7 +8,7 @@ Muslim Travel Market Intelligence Dashboard
 
 Build a lightweight web dashboard that visualizes key insights from CrescentRating and GMTI (Global Muslim Travel Index) public sources, allowing non-technical stakeholders to quickly understand destination performance, regional distribution, and available market indicators for the selected GMTI year.
 
-The dashboard should communicate the most important available metric within 3 seconds and enable users to explore supporting data interactively. If a metric is not exposed by fetched public sources for the selected year, it must be hidden or rendered as unavailable rather than filled with fallback data.
+The dashboard should communicate the most important available metric within 3 seconds and enable users to explore supporting data interactively. If a metric is not exposed by fetched public sources for the selected year, it must be hidden or rendered as unavailable rather than replaced.
 
 ---
 
@@ -184,44 +184,6 @@ Each destination card includes:
 - Rank change
 - Source year label, for example `GMTI 2025 CSV`
 
-Example:
-
-### Malaysia
-
-Tags:
-
-- Halal Food
-- Prayer Facilities
-- Family Friendly
-
-### Saudi Arabia
-
-Tags:
-
-- Religious Tourism
-- Premium Infrastructure
-
-### Türkiye
-
-Tags:
-
-- Heritage
-- Halal Dining
-
-### UAE
-
-Tags:
-
-- Luxury
-- Connectivity
-
-### Indonesia
-
-Tags:
-
-- Natural Attractions
-- Muslim-Friendly Services
-
 ---
 
 ## 4. Regional Market Distribution
@@ -297,14 +259,15 @@ Purpose:
 
 Priority:
 
-1. Market Size KPI
-2. Growth Trend
-3. Top Destinations
-4. Regional Breakdown
+1. Most important available KPI, usually Top Region for CSV-driven historical years
+2. GMTI score chart
+3. Regional distribution
+4. Destination cards with Top N selector
+5. Live data trace
 
 A user should immediately notice:
 
-"Muslim Travel Market = XXX Million Travelers"
+"Which region and destinations lead for the selected GMTI year"
 
 within 3 seconds.
 
@@ -358,9 +321,10 @@ The implementation should use a clean Next.js structure so issues can be traced 
    - Responsible for data sources, API/public-source fetching, parsing, normalization, and formatting helpers.
    - `lib/sourceFetchers.js` should contain fetching logic only.
    - `lib/marketParser.js` should contain source-specific parsing logic only.
-- `lib/marketData.js` should normalize parsed values into the dashboard data model.
-- Missing or unparseable values must stay unavailable and render as `-`; do not use fallback or sample values.
-- If the selected GMTI CSV is unavailable, the dashboard must show an unavailable state and log the failed source; do not substitute another year or secondary source as real data.
+   - `lib/marketData.js` should expose the UI-facing loader.
+   - `lib/marketScraper.js` should normalize parsed values into the dashboard data model.
+   - Missing or unparseable values must stay unavailable and render as `-`; do not use fallback or sample values.
+   - If the selected GMTI CSV is unavailable, the dashboard must show an unavailable state and log the failed source; do not substitute another year or secondary source as real data.
 
 3. `components`
    - Responsible for dashboard UI sections and reusable presentation components.
